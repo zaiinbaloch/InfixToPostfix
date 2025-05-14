@@ -1,0 +1,124 @@
+#include<iostream>
+#include<string>
+
+using namespace std;
+
+class Stack {// Stack class to implement stack operations
+private:
+	int top;// Index of the top element in the stack
+	int size;// Size of the stack
+	char arr[100];// Array to store stack elements
+public:
+	Stack() {
+		top = -1;
+		size = 100;
+	}
+	bool isEmpty() {// Check if stack is empty
+		if (top==-1)
+		{
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	bool isFull() { // Check if stack is full
+		if (top == size - 1) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	void push(char c) {// Push an element onto the stack
+		if (isFull()) {
+			cout << "Stack is overflow";
+			return;// Return if stack is full
+		}
+		else {
+			top++;// Increase the top index
+			arr[top] = c;// Store the element at the top index
+		}
+
+	}
+	char Top() {// Return the top element of the stack
+		if (isEmpty()) {
+			return '\0';// Return null character if stack is empty
+		}
+		else {
+			return arr[top];
+		}
+	}
+
+	char pop() {// Pop an element from the stack
+		if (isEmpty())
+		{
+			cout << "Stack is underflow";
+			return'\0';// Return null character if stack is empty
+		}
+		else {
+			char c = arr[top];// Store the top element
+			top--;// Decrease the top index
+			return c;
+		}
+	}
+};
+
+int prec(char op) {// Function to return the precedence of operators
+	if (op == '^') {// Exponent operator has the highest precedence
+		return 3;
+	}
+	else if (op == '*' || op == '/') {// Multiplication and division have higher precedence than addition and subtraction
+		return 2;
+	}
+	else if (op == '-' || op == '+') {// Addition and subtraction have lower precedence
+		return 1;
+	}
+	else
+		return 0;// If the operator is not recognized, return 0 precedence
+
+}
+bool isOperator(char c) {// Function to check if a character is an operator
+	return(c == '-' || c == '+' || c == '*' || c == '/');
+}
+
+string InfixtoPostfix(string infix) {// Function to convert infix expression to postfix
+	Stack s;
+	string pstfix = "";// String to store postfix expression
+	for (int i = 0; i < infix.length(); i++) {// Loop through each character in the infix expression
+		char c = infix[i];// Get the current character
+		if (isalnum(c)) {// If the character is an operand, add it to the postfix expression
+			pstfix += c;
+		}
+		else if (c == '(') { // If the character is '(', push it onto the stack
+			s.push(c);
+		}
+		else if (c == ')') { // If the character is ')', pop from the stack until '(' is found
+			while (!s.isEmpty() && s.Top() != '(') {// Pop elements from the stack and add them to the postfix expression
+				s.pop();
+			}
+			s.pop();// Pop the '(' from the stack
+		}
+		else if (isOperator(c)) { // If the character is an operator, pop from the stack until the top of the stack has an operator of lower precedence
+			while (!s.isEmpty() && prec(s.Top()) >= prec(c)) {// Pop elements from the stack and add them to the postfix expression
+				pstfix += s.pop();// Pop elements from the stack and add them to the postfix expression
+			}
+			s.push(c); // Push the current operator onto the stack
+		}
+
+	}
+
+	while (!s.isEmpty()) {   // Pop all remaining elements from the stack and add them to the postfix expression
+		pstfix += s.pop();// Pop elements from the stack and add them to the postfix expression
+	}
+	return pstfix;// Return the postfix expression
+} 
+int main() {
+	string infix;// String to store infix expression
+	cout << "Enter a Expression" << endl;
+	cin >> infix;// Input infix expression from user
+	string pstfix = InfixtoPostfix(infix);// Convert infix to postfix
+	cout << "PostFix expression : " << pstfix << endl;// Output the postfix expression
+	return 0;
+}
